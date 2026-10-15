@@ -187,6 +187,8 @@ for epoch in range(epochs):
     train_loss = total_loss / len(train_loader)
     train_acc = correct1 / total1
 
+    model.eval()
+
     with torch.no_grad():
         for X_batch, y_batch in test_loader:
             X_batch = X_batch.to(device)
@@ -215,7 +217,7 @@ for epoch in range(epochs):
             f"Test Acc: {test_acc:.4f}"
         )
 
-model.eval()
+
 
 epochs_range = range(1, len(train_losses) + 1)
 
