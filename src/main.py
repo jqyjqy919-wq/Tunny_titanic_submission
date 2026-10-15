@@ -19,24 +19,6 @@ seed = 42
 np.random.seed(seed)
 torch.manual_seed(seed)
 
-#数据预处理和特征工程
-known_ages = df["Age"].dropna()
-missing_age = df[df["Age"].isna()].index
-df.loc[missing_age, "Age"] = np.random.choice(known_ages, size=len(missing_age))
-
-df["Embarked"]=df['Embarked'].fillna(df['Embarked'].mode()[0])
-
-df["Sex"] = df["Sex"].map({"male": 0,"female": 1})
-
-df=df.drop(['PassengerID','Cabin','Ticket','Name'], axis=1)
-
-df['FamilySize'] = df['SibSp'] + df['Parch'] + 1
-df["IsAlone"] = (df["FamilySize"] == 1).astype(int)
-
-df=pd.get_dummies(df,columns=["Embarked"],drop_first=True,dtype=int)
-df=pd.get_dummies(df,columns=["Pclass"],drop_first=True,dtype=int)
-
-
 
 train, test = train_test_split(
     df,
@@ -44,6 +26,37 @@ train, test = train_test_split(
     random_state=42,
     stratify=df["Survived"]
 )
+
+#数据预处理和特征工程
+known_ages = train["Age"].dropna()
+missing_age = train[df["Age"].isna()].index
+train.loc[missing_age, "Age"] = np.random.choice(known_ages, size=len(missing_age))
+
+train["Embarked"]=train['Embarked'].fillna(train['Embarked'].mode()[0])
+
+train["Sex"] = train["Sex"].map({"male": 0,"female": 1})
+
+train=train.drop(['PassengerID','Cabin','Ticket','Name'], axis=1)
+
+train['FamilySize'] = train['SibSp'] + train['Parch'] + 1
+train["IsAlone"] = (train["FamilySize"] == 1).astype(int)
+
+train=pd.get_dummies(train,columns=["Embarked"],drop_first=True,dtype=int)
+train=pd.get_dummies(train,columns=["Pclass"],drop_first=True,dtype=int)
+
+
+test["Embarked"]=test['Embarked'].fillna(test['Embarked'].mode()[0])
+test["Age"]=test['Age'].fillna(test['Age'].mean())
+
+test["Sex"] = test["Sex"].map({"male": 0,"female": 1})
+
+test=test.drop(['PassengerID','Cabin','Ticket','Name'], axis=1)
+
+test['FamilySize'] = test['SibSp'] + test['Parch'] + 1
+test["IsAlone"] = (test["FamilySize"] == 1).astype(int)
+
+test=pd.get_dummies(test,columns=["Embarked"],drop_first=True,dtype=int)
+test=pd.get_dummies(test,columns=["Pclass"],drop_first=True,dtype=int)
 
 #标准化
 num_cols =['Age','FamilySize','Fare']
@@ -196,7 +209,6 @@ for epoch in range(epochs):
 
             logits = model(X_batch).squeeze(1)
             probs = torch.sigmoid(logits)
-
             preds = (probs >= 0.5).float()
 
             correct2 += (preds == y_batch).sum().item()
