@@ -29,7 +29,7 @@ train, test = train_test_split(
 
 #数据预处理和特征工程
 known_ages = train["Age"].dropna()
-missing_age = train[df["Age"].isna()].index
+missing_age = train[train["Age"].isna()].index
 train.loc[missing_age, "Age"] = np.random.choice(known_ages, size=len(missing_age))
 
 train["Embarked"]=train['Embarked'].fillna(train['Embarked'].mode()[0])
